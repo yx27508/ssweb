@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>社工库吐槽机器人</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0 }
+    /* 弹窗 */
+    #agreementModal {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.6);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999;
+    }
+    #agreementBox {
+      background:#fff; padding:20px;
+      width:90%; max-width:400px;
+      border-radius:8px;
+    }
+    #terms {
+      max-height:180px; overflow-y:auto;
+      border:1px solid #ccc; padding:10px; margin-bottom:12px;
+    }
+    #agreeControls { display:flex; align-items:center; gap:8px }
+    #agreeBtn {
+      margin-top:12px; padding:8px 16px;
+      background:#007bff; color:#fff; border:none;
+      cursor:pointer; border-radius:4px;
+    }
+    #agreeBtn:disabled { background:#aaa; cursor:not-allowed }
+
+    /* 聊天界面 */
+    #chatUI {
+      display:none; padding:20px; font-family:sans-serif;
+    }
+    #chatUI h1 { margin-bottom:12px }
+    #input {
+      width:100%; padding:8px; font-size:1rem;
+      margin-bottom:8px; resize:vertical;
+    }
+    #sendBtn {
+      padding:8px 16px; background:#28a745;
+      color:#fff; border:none; cursor:pointer;
+      border-radius:4px;
+    }
+    #sendBtn:disabled { background:#aaa; cursor:not-allowed }
+    #response {
+      margin-top:12px; white-space:pre-wrap;
+      background:#f7f7f7; padding:10px;
+      border-radius:4px; min-height:80px;
+      color:#000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 使用条款弹窗 -->
+  <div id="agreementModal">
+    <div id="agreementBox">
+      <h2>使用条款与保密协议</h2>
+      <div id="terms">
+        <p>欢迎使用本社工库吐槽机器人。在使用前，请仔细阅读：</p>
+        <ul>
+          <li>• 吐槽内容仅用于分析，不会公开。</li>
+          <li>• 请勿输入敏感信息或违法内容。</li>
+          <li>• 本系统仅供参考，不构成建议。</li>
+        </ul>
+      </div>
+      <div id="agreeControls">
+        <input type="checkbox" id="agreeCheckbox">
+        <label for="agreeCheckbox">我已阅读并同意</label>
+      </div>
+      <button id="agreeBtn" disabled>同意并继续</button>
+    </div>
+  </div>
+
+  <!-- 聊天主界面 -->
+  <div id="chatUI">
+    <h1>社工库吐槽机器人</h1>
+    <textarea id="input" rows="4" placeholder="请输入吐槽…" autofocus></textarea><br>
+    <button id="sendBtn">发送</button>
+    <pre id="response"></pre>
+  </div>
+
+  <script src="/static/script.js"></script>
+  <script>
+    // 弹窗逻辑
+    const modal    = document.getElementById("agreementModal"),
+          agreeChk = document.getElementById("agreeCheckbox"),
+          agreeBtn = document.getElementById("agreeBtn"),
+          chatUI   = document.getElementById("chatUI"),
+          terms    = document.getElementById("terms");
+
+    function updateAgree() {
+      const atBottom = terms.scrollTop + terms.clientHeight >= terms.scrollHeight;
+      agreeBtn.disabled = !(agreeChk.checked && atBottom);
+    }
+    terms.addEventListener("scroll", updateAgree);
+    agreeChk.addEventListener("change", updateAgree);
+    agreeBtn.addEventListener("click", () => {
+      localStorage.setItem("chatbotAgreed","1");
+      modal.style.display="none";
+      chatUI.style.display="block";
+    });
+    if (localStorage.getItem("chatbotAgreed")==="1") {
+      modal.style.display="none";
+      chatUI.style.display="block";
+    }
+  </script>
+</body>
+</html>
